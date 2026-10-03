@@ -208,53 +208,53 @@
 
     <!-- 2 Column Section -->
     <div class="grid-two">
-      <!-- Speed Verification Engine Card -->
+      <!-- Speed Test Card -->
       <div class="panel-card">
         <div class="panel-title">
-          <span>Speed Verification Engine</span>
+          <span>Speed Benchmark</span>
           <span style="font-size: 0.75rem; color: var(--success); font-weight: 600;" id="matchStatus">READY</span>
         </div>
-        <p style="font-size: 0.82rem; color: var(--text-muted);">Verifies baseline internet speed vs proxy direct capability vs full-tunnel throughput.</p>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Compare connection throughput between direct connection and proxy tunnel.</p>
 
         <div class="verify-box">
           <div class="verify-item">
-            <span class="verify-name">Direct Internet Baseline</span>
+            <span class="verify-name">Direct Connection</span>
             <span class="verify-val" id="resDirect">--</span>
           </div>
           <div class="verify-item">
-            <span class="verify-name">SOCKS5 Proxy Direct</span>
+            <span class="verify-name">Proxy Connection</span>
             <span class="verify-val" id="resProxy">--</span>
           </div>
           <div class="verify-item">
-            <span class="verify-name">Throughput Match Accuracy</span>
+            <span class="verify-name">Efficiency Ratio</span>
             <span class="verify-val" id="resMatch" style="color: var(--success);">--</span>
           </div>
         </div>
 
-        <button class="btn-sub" id="btnVerify" onclick="runSpeedVerification()">Run Speed Verification</button>
+        <button class="btn-sub" id="btnVerify" onclick="runSpeedVerification()">Run Speed Test</button>
       </div>
 
-      <!-- Public IP Verification & Local Proxy -->
+      <!-- Public IP & Local Relay Card -->
       <div class="panel-card">
         <div class="panel-title">
-          <span>Public IP & Anti-Loop Proxy</span>
+          <span>Network & IP Info</span>
         </div>
-        <p style="font-size: 0.82rem; color: var(--text-muted);">Windows public outbound IP verification and embedded local SOCKS5 proxy server.</p>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Check current public IP address and manage local relay listener.</p>
 
         <div class="verify-box">
           <div class="verify-item">
-            <span class="verify-name">Outbound Public IP</span>
+            <span class="verify-name">Current Public IP</span>
             <span class="verify-val" id="detectedIP">Querying...</span>
           </div>
           <div class="verify-item">
-            <span class="verify-name">Local Proxy (Port 10800)</span>
+            <span class="verify-name">Local Relay (Port 10800)</span>
             <span class="verify-val" id="localProxyStatus" style="color: var(--warning);">Stopped</span>
           </div>
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button class="btn-sub" style="flex: 1;" onclick="checkPublicIP()">Verify IP</button>
-          <button class="btn-sub" style="flex: 1;" id="btnLocalProxy" onclick="toggleLocalProxy()">Toggle Local Proxy</button>
+          <button class="btn-sub" style="flex: 1;" onclick="checkPublicIP()">Check IP</button>
+          <button class="btn-sub" style="flex: 1;" id="btnLocalProxy" onclick="toggleLocalProxy()">Toggle Local Relay</button>
         </div>
       </div>
     </div>
