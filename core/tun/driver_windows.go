@@ -18,7 +18,13 @@ import (
 )
 
 //go:embed wintun_amd64.dll
-var embeddedWintunDLL []byte
+var embeddedWintunAMD64 []byte
+
+//go:embed wintun_x86.dll
+var embeddedWintunX86 []byte
+
+//go:embed wintun_arm64.dll
+var embeddedWintunARM64 []byte
 
 // Device represents a TUN network interface
 type Device interface {
@@ -41,18 +47,43 @@ type WintunDevice struct {
 
 // EnsureWintunDLL makes sure matching wintun.dll is available in current folder or extracted from binary
 func EnsureWintunDLL() error {
-	if _, err := os.Stat("wintun.dll"); os.IsNotExist(err) {
-		if len(embeddedWintunDLL) > 0 {
-			_ = os.WriteFile("wintun.dll", embeddedWintunDLL, 0755)
+	var targetDLL []byte
+	switch runtime.GOARCH {
+	case "386":
+		targetDLL = embeddedWintunX86
+	case "arm64":
+		targetDLL = embeddedWintunARM64
+	default:
+		targetDLL = embeddedWintunAMD64
+	}
+
+	if len(targetDLL) == 0 {
+		return fmt.Errorf("no embedded wintun.dll found for architecture: %s", runtime.GOARCH)
+	}
+
+	ensureFile := func(targetPath string) {
+		fi, err := os.Stat(targetPath)
+		if err != nil || fi.Size() != int64(len(targetDLL)) {
+			_ = os.WriteFile(targetPath, targetDLL, 0755)
 		}
 	}
 
-	absPath, err := filepath.Abs("wintun.dll")
-	if err == nil {
-		handle, err := windows.LoadLibrary(absPath)
-		if err == nil && handle != 0 {
-			return nil
-		}
+	// 1. Ensure in current working directory
+	if cwd, err := os.Getwd(); err == nil {
+		cwdDLL := filepath.Join(cwd, "wintun.dll")
+		ensureFile(cwdDLL)
+		_, _ = windows.LoadLibrary(cwdDLL)
+	} else {
+		ensureFile("wintun.dll")
+	}
+
+	// 2. Ensure in application executable directory (crucial for 'go run' where exe runs in temp folder,
+	// because wintun driver library searches LOAD_LIBRARY_SEARCH_APPLICATION_DIR)
+	if exePath, err := os.Executable(); err == nil {
+		exeDir := filepath.Dir(exePath)
+		exeDLL := filepath.Join(exeDir, "wintun.dll")
+		ensureFile(exeDLL)
+		_, _ = windows.LoadLibrary(exeDLL)
 	}
 
 	return nil
