@@ -1,33 +1,33 @@
-# FullTunnel Enterprise 🛡️
-> **Enterprise-Grade Windows Full-Tunnel Proxy Connector**
+# FullTunnel Proxy
+
+> A Windows system-wide Layer-3 proxy client routing OS traffic through SOCKS5 and HTTP proxies via Wintun.
 
 [![Go Version](https://img.shields.io/badge/Go-1.24%2B-00ADD8?style=flat-square&logo=go)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20(x64%20%7C%20ARM64)-blue?style=flat-square&logo=windows)](https://microsoft.com/windows)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
-**FullTunnel Enterprise** adalah aplikasi konektor proxy full-tunnel untuk Windows yang mengalihkan **100% trafik OS** (TCP, UDP, ICMP, DNS) pada network layer (Layer 3) melalui driver kernel **Wintun** ke upstream proxy (SOCKS5 / HTTP CONNECT). Dilengkapi sistem **Fake-IP Zero-Leak DNS**, userspace TCP/IP stack (**gVisor Netstack**), dan antarmuka **Modern Web Dashboard**.
-
----
-
-## 🌟 Fitur Utama
-
-- 🛡️ **100% System-Wide Coverage:** Menangkap seluruh trafik jaringan sistem operasi (Browser, Game, Terminal, SSH, Docker, Git, Python, Node.js).
-- 🔑 **Full Upstream Authentication:**
-  - **SOCKS5:** No-Auth (`0x00`) & Username/Password Authentication (`0x02` - RFC 1929).
-  - **HTTP/HTTPS CONNECT:** Basic Authentication (`Proxy-Authorization: Basic`).
-- ⚡ **Driver Kernel C Wintun:** Throughput multi-gigabit dengan ring buffer 4MB dan CPU overhead < 1%.
-- 🌐 **Zero DNS Leak (Fake-IP Engine):** Menjawab query DNS lokal dari pool `198.18.0.0/15` dalam 0ms tanpa mengirim DNS query mentah ke ISP lokal.
-- 🎮 **Dukungan Penuh UDP:** UDP Associate penuh untuk game, VoIP, dan komunikasi real-time melalui proxy.
-- 📊 **Real-time Live Telemetry:** Web dashboard dengan grafik throughput (Upload/Download), monitor socket aktif, dan verifikasi IP publik instan.
-- 🔁 **Auto Loop-Prevention & Safe Rollback:** Otomatis menambahkan static route untuk IP Proxy upstream agar tidak terjadi routing loop, dan merestorasi tabel routing Windows secara aman saat ditutup.
+FullTunnel Proxy is a system-wide proxy client for Windows. It redirects operating system network traffic (TCP, UDP, and DNS) at Layer 3 using the Wintun kernel driver to an upstream SOCKS5 or HTTP/HTTPS proxy. It includes a Fake-IP DNS engine to prevent DNS leaks, a user-space network stack (gVisor Netstack), and a local web dashboard alongside a headless CLI.
 
 ---
 
-## 🏗️ Arsitektur Sistem
+## Key Features
+
+- **System-Wide Routing:** Captures all network traffic across the operating system, including browsers, terminal utilities, SSH, games, and background services.
+- **Proxy Protocol Support:**
+  - **SOCKS5:** Unauthenticated and Username/Password authentication (RFC 1928, RFC 1929).
+  - **HTTP/HTTPS CONNECT:** Basic authentication support (`Proxy-Authorization`).
+- **Wintun Driver Integration:** High-throughput Layer-3 virtual TUN adapter using the official Wintun driver with minimal CPU overhead.
+- **DNS Leak Protection (Fake-IP Engine):** Intercepts local port 53 DNS queries in user-space and maps domain names to a local synthetic IP pool (`198.18.0.0/15`). Domain resolution is performed remotely by the upstream proxy server.
+- **UDP Relay Support:** Full UDP association support for applications and real-time protocols over proxy connections.
+- **Web Dashboard & Headless CLI:** Real-time bandwidth telemetry, active socket monitoring, and public IP verification with dual interfaces.
+- **Automatic Route Management:** Sets default routing paths with automatic static routes to prevent proxy loops, cleanly restoring routing tables upon shutdown.
+
+---
+
+## System Architecture
 
 ```
-[ OS Applications (Browser, CLI, Game) ]
+[ OS Applications (Browser, CLI, Utilities) ]
                  │
                  ▼
 [ Windows Network Stack (Layer 3) ]
@@ -36,12 +36,12 @@
    [ Wintun Virtual Adapter (Layer 3 TUN) ]
                  │
                  ▼
-     [ gVisor Netstack (Userspace TCP/IP) ]
+     [ gVisor Netstack (User-space TCP/IP) ]
                  │
        ┌─────────┴─────────┐
        ▼                   ▼
  [ Fake-IP DNS Engine ]  [ Proxy Upstream Dialer ]
-  (Zero Leak 198.18/15)   (SOCKS5 / HTTP Auth)
+  (198.18.0.0/15 Pool)    (SOCKS5 / HTTP Auth)
                            │
                            ▼
                   [ Upstream Proxy Server ]
@@ -52,127 +52,127 @@
 
 ---
 
-## 📁 Struktur Direktori Repository
+## Repository Structure
 
 ```
 full_tunnel/
 ├── .github/
 │   └── workflows/
-│       └── build.yml               # GitHub Actions CI automated build
+│       └── build.yml               # GitHub Actions CI build workflow
 ├── cmd/
-│   ├── fulltunnel/                 # GUI & Web Dashboard entrypoint
+│   ├── fulltunnel/                 # Web Dashboard and GUI entrypoint
 │   │   └── main.go
 │   ├── cli/                        # Headless CLI entrypoint
 │   │   └── main.go
-│   └── speedtest/                  # Speed benchmark CLI tool
+│   └── speedtest/                  # Bandwidth benchmark utility
 │       └── main.go
 ├── core/                           # Core networking engine
-│   ├── config/                     # Configuration management & JSON parsing
-│   ├── dns/                        # Fake-IP Zero-Leak DNS server
+│   ├── config/                     # Configuration management
+│   ├── dns/                        # Fake-IP DNS server implementation
 │   ├── logger/                     # Structured logging
-│   ├── proxy/                      # SOCKS5 (RFC 1928/1929) & HTTP dialers
+│   ├── proxy/                      # SOCKS5 and HTTP client dialers
 │   ├── router/                     # Windows routing table manager
-│   ├── server/                     # Local SOCKS5 listener relay
-│   ├── stack/                      # Userspace TCP/IP stack (gVisor)
-│   ├── stats/                      # Telemetry & bandwidth tracker
-│   ├── tun/                        # Layer-3 Wintun driver & embedded DLLs
-│   ├── admin_windows.go            # Windows UAC admin permission checker
-│   └── engine.go                   # Orchestrator
-├── docs/                           # Dokumentasi teknis
-│   ├── ARCHITECTURE_FLOW.md        # Diagram detail alur paket & packet pipeline
-│   └── PRD.md                      # Product Requirements Document
-├── scripts/                        # Script otomasi Windows
-│   ├── build.bat                   # 1-Click build script untuk Windows
-│   └── toten.bat                   # Emergency stop & reset route script
+│   ├── server/                     # Local relay listener
+│   ├── stack/                      # User-space TCP/IP stack (gVisor)
+│   ├── stats/                      # Bandwidth tracking and metrics
+│   ├── tun/                        # Layer-3 Wintun driver interface
+│   ├── admin_windows.go            # Windows administrator privileges helper
+│   └── engine.go                   # Core lifecycle coordinator
+├── docs/                           # Documentation
+│   ├── ARCHITECTURE_FLOW.md        # Packet pipeline and sequence diagrams
+│   └── PRD.md                      # Product requirements document
+├── scripts/                        # Utility scripts
+│   ├── build.bat                   # Build script for Windows
+│   └── toten.bat                   # Emergency route reset script
 ├── web/                            # Embedded Web Dashboard
-│   ├── dashboard.html              # Modern glassmorphism UI
-│   ├── html.go                     # Embedded HTML assets
-│   └── server.go                   # REST API & WebSocket handlers
-├── wintun_sdk/                     # Official signed Wintun drivers (x86, amd64, ARM64)
-├── .gitattributes                  # Git line endings & binary flags
+│   ├── dashboard.html              # Frontend user interface
+│   ├── html.go                     # Static asset embedding
+│   └── server.go                   # HTTP API and WebSocket handlers
+├── wintun_sdk/                     # Wintun driver headers and documentation
+├── .gitattributes                  # Git line-ending configuration
 ├── .gitignore                      # Git ignore rules
 ├── go.mod                          # Go module dependencies
-├── go.sum                          # Module checksums
+├── go.sum                          # Go module checksums
 ├── LICENSE                         # MIT License
 ├── Makefile                        # Build targets
-├── main.go                         # Root entrypoint
-└── README.md                       # Dokumentasi utama
+├── main.go                         # Default project entrypoint
+└── README.md                       # Main documentation
 ```
 
 ---
 
-## 🚀 Cara Menjalankan
+## Getting Started
 
 > [!IMPORTANT]
-> **Wajib dijalankan sebagai Administrator** (Run as Administrator) karena program perlu mendaftarkan virtual adapter Wintun dan mengatur Windows Routing Table.
+> Must be run with **Administrator privileges** to register the Wintun adapter and configure the Windows routing table.
 
-### 1. Langsung Jalankan (Tanpa Build Executable)
-Buka PowerShell (Run as Administrator):
+### 1. Running Directly from Source
+Open PowerShell or Command Prompt as Administrator:
 ```powershell
-# Jalankan GUI / Web Dashboard langsung:
+# Run the Web Dashboard:
 go run .
 
-# Atau jalankan Headless CLI langsung:
-go run ./cmd/cli 127.0.0.1:1080
+# Or run the Headless CLI:
+go run ./cmd/cli -host 127.0.0.1 -port 1080 -type socks5
 ```
 
-### 2. Kompilasi Manual dengan `go build`
+### 2. Compiling Executables
 ```bash
-# GUI / Web Dashboard (menghasilkan fulltunnel.exe)
+# Build the Web Dashboard (produces fulltunnel.exe):
 go build -ldflags "-s -w" -o fulltunnel.exe main.go
 
-# Headless CLI (menghasilkan fulltunnel-cli.exe)
+# Build the Headless CLI (produces fulltunnel-cli.exe):
 go build -ldflags "-s -w" -o fulltunnel-cli.exe ./cmd/cli/main.go
 ```
-*(Atau kamu juga bisa gunakan script otomasi `scripts\build.bat`)*
+*(Alternatively, use `scripts\build.bat`)*
 
-### 3. Menjalankan Binary GUI / Web Dashboard
-Klik kanan `fulltunnel.exe` -> **Run as Administrator**, atau jalankan lewat PowerShell:
+### 3. Running the Web Dashboard Binary
+Right-click `fulltunnel.exe` and select **Run as Administrator**, or run from an elevated terminal:
 ```powershell
 .\fulltunnel.exe
 ```
-Browser akan otomatis terbuka menampilkan dashboard di `http://127.0.0.1:28888`.
+The browser will automatically open the dashboard at `http://127.0.0.1:28888`.
 
-#### Opsi Command Line:
-- `.\fulltunnel.exe --headless` (Jalankan tanpa otomatis membuka browser)
-- `.\fulltunnel.exe --connect` (Otomatis langsung mengaktifkan tunnel saat start)
-- `.\fulltunnel.exe --port 30000` (Ganti port web dashboard)
+#### Command-line Options:
+- `.\fulltunnel.exe --headless` (Starts without opening the default browser)
+- `.\fulltunnel.exe --connect` (Automatically activates the tunnel on startup)
+- `.\fulltunnel.exe --port 30000` (Specifies a custom dashboard port)
 
 ---
 
-### 4. Menjalankan Binary Headless CLI
-Jalankan langsung melalui PowerShell / Command Prompt (Admin):
+### 4. Running the Headless CLI Binary
+Run from an elevated Command Prompt or PowerShell:
 ```powershell
-.\fulltunnel-cli.exe -host 203.0.113.50 -port 1080 -type socks5 -user myuser -pass mysecretpassword
+.\fulltunnel-cli.exe -host 203.0.113.50 -port 1080 -type socks5 -user myuser -pass mypassword
 ```
 
-#### Argumen CLI:
-- `-host`: IP Address atau Domain Server Proxy (Wajib)
-- `-port`: Port Server Proxy (Default: `1080`)
-- `-type`: Protokol (`socks5`, `http`, `https`)
-- `-user`: Username autentikasi (Opsional)
-- `-pass`: Password autentikasi (Opsional)
+#### CLI Parameters:
+- `-host`: Target proxy server IP or hostname (Required)
+- `-port`: Proxy port (Default: `1080`)
+- `-type`: Proxy protocol (`socks5`, `http`, `https`)
+- `-user`: Authentication username (Optional)
+- `-pass`: Authentication password (Optional)
 
 ---
 
-## 📂 Struktur Konfigurasi (`config.json`)
+## Configuration (`config.json`)
 
-Konfigurasi disimpan secara otomatis di:
+Configuration is saved automatically to:
 `%USERPROFILE%\AppData\Roaming\FullTunnel\config.json`
 
-Contoh isi konfigurasi:
+Example configuration:
 ```json
 {
   "active_profile_id": "prof-1",
   "profiles": [
     {
       "id": "prof-1",
-      "name": "Corporate SOCKS5",
+      "name": "Default Proxy",
       "type": "socks5",
       "host": "proxy.example.com",
       "port": 10808,
-      "username": "corporate_user",
-      "password": "secret_password_123",
+      "username": "user",
+      "password": "secret_password",
       "enable_udp": true,
       "dns_mode": "fakeip",
       "bypass_lan": true
@@ -193,23 +193,6 @@ Contoh isi konfigurasi:
 
 ---
 
-## 📤 Cara Push ke GitHub
+## License
 
-Ikuti langkah-langkah berikut untuk mengunggah repositori ini ke GitHub:
-
-```bash
-# 1. Buka folder full_tunnel di terminal
-cd "C:\Users\Kapiarso\Desktop\Project_Porto\full_tunnel"
-
-# 2. Hubungkan dengan remote repository GitHub kamu
-git remote add origin https://github.com/<USERNAME-KAMU>/<NAMA-REPO-KAMU>.git
-
-# 3. Push ke GitHub
-git push -u origin main
-```
-
----
-
-## 📜 Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
