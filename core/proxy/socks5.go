@@ -47,7 +47,7 @@ func OptimizeRadminP2PTunnel(targetHost string) {
 	dummyPayload := []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05}
 	for _, port := range ports {
 		go func(p int) {
-			addr := fmt.Sprintf("%s:%d", host, p)
+			addr := net.JoinHostPort(host, strconv.Itoa(p))
 			conn, err := net.DialTimeout("udp", addr, 1*time.Second)
 			if err == nil {
 				_ = conn.SetDeadline(time.Now().Add(500 * time.Millisecond))
