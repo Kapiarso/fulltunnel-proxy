@@ -28,10 +28,10 @@ jobs:
       run: |
         go test -v ./core/...
 
-    - name: Build SecureTunnel GUI
+    - name: Build FullTunnel GUI
       run: |
-        go build -v -ldflags "-s -w" -o securetunnel.exe main.go
+        go build -v -ldflags "-s -w" -o fulltunnel.exe main.go
 
-    - name: Build SecureTunnel Headless CLI
+    - name: Build FullTunnel Headless CLI
       run: |
-        go build -v -ldflags "-s -w" -o securetunnel-cli.exe ./cmd/cli/main.go
+        go build -v -ldflags "-s -w" -o fulltunnel-cli.exe ./cmd/cli/main.go

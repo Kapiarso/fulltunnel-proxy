@@ -101,7 +101,7 @@ func CreateWintunDevice(name string, ipStr, maskStr string, mtu int) (*WintunDev
 
 	if err != nil {
 		if strings.Contains(err.Error(), "Access is denied") {
-			return nil, fmt.Errorf("Administrator privileges required to create Wintun network adapter (Access is denied). Please right-click securetunnel.exe and select 'Run as administrator'")
+			return nil, fmt.Errorf("Administrator privileges required to create Wintun network adapter (Access is denied). Please right-click fulltunnel.exe and select 'Run as administrator'")
 		}
 		return nil, fmt.Errorf("failed to start Wintun adapter session after retries: %v", err)
 	}

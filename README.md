@@ -1,4 +1,4 @@
-# SecureTunnel Enterprise 🛡️
+# FullTunnel Enterprise 🛡️
 > **Enterprise-Grade Windows Full-Tunnel Proxy Connector**
 
 [![Go Version](https://img.shields.io/badge/Go-1.24%2B-00ADD8?style=flat-square&logo=go)](https://go.dev/)
@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
-**SecureTunnel Enterprise** adalah aplikasi konektor proxy full-tunnel untuk Windows yang mengalihkan **100% trafik OS** (TCP, UDP, ICMP, DNS) pada network layer (Layer 3) melalui driver kernel **Wintun** ke upstream proxy (SOCKS5 / HTTP CONNECT). Dilengkapi sistem **Fake-IP Zero-Leak DNS**, userspace TCP/IP stack (**gVisor Netstack**), dan antarmuka **Modern Web Dashboard**.
+**FullTunnel Enterprise** adalah aplikasi konektor proxy full-tunnel untuk Windows yang mengalihkan **100% trafik OS** (TCP, UDP, ICMP, DNS) pada network layer (Layer 3) melalui driver kernel **Wintun** ke upstream proxy (SOCKS5 / HTTP CONNECT). Dilengkapi sistem **Fake-IP Zero-Leak DNS**, userspace TCP/IP stack (**gVisor Netstack**), dan antarmuka **Modern Web Dashboard**.
 
 ---
 
@@ -60,7 +60,7 @@ full_tunnel/
 │   └── workflows/
 │       └── build.yml               # GitHub Actions CI automated build
 ├── cmd/
-│   ├── securetunnel/               # GUI & Web Dashboard entrypoint
+│   ├── fulltunnel/                 # GUI & Web Dashboard entrypoint
 │   │   └── main.go
 │   ├── cli/                        # Headless CLI entrypoint
 │   │   └── main.go
@@ -106,39 +106,44 @@ full_tunnel/
 > [!IMPORTANT]
 > **Wajib dijalankan sebagai Administrator** (Run as Administrator) karena program perlu mendaftarkan virtual adapter Wintun dan mengatur Windows Routing Table.
 
-### 1. Kompilasi Binary
-
-Kamu bisa mengompilasi program dengan script otomatis:
-```cmd
-scripts\build.bat
-```
-Atau manual menggunakan Go:
-```bash
-# GUI / Web Dashboard
-go build -ldflags "-s -w" -o securetunnel.exe main.go
-
-# Headless CLI
-go build -ldflags "-s -w" -o securetunnel-cli.exe ./cmd/cli/main.go
-```
-
-### 2. Mode GUI / Web Dashboard (Rekomendasi)
-Klik kanan `securetunnel.exe` -> **Run as Administrator**, atau jalankan lewat PowerShell:
+### 1. Langsung Jalankan (Tanpa Build Executable)
+Buka PowerShell (Run as Administrator):
 ```powershell
-.\securetunnel.exe
+# Jalankan GUI / Web Dashboard langsung:
+go run .
+
+# Atau jalankan Headless CLI langsung:
+go run ./cmd/cli 127.0.0.1:1080
+```
+
+### 2. Kompilasi Manual dengan `go build`
+```bash
+# GUI / Web Dashboard (menghasilkan fulltunnel.exe)
+go build -ldflags "-s -w" -o fulltunnel.exe main.go
+
+# Headless CLI (menghasilkan fulltunnel-cli.exe)
+go build -ldflags "-s -w" -o fulltunnel-cli.exe ./cmd/cli/main.go
+```
+*(Atau kamu juga bisa gunakan script otomasi `scripts\build.bat`)*
+
+### 3. Menjalankan Binary GUI / Web Dashboard
+Klik kanan `fulltunnel.exe` -> **Run as Administrator**, atau jalankan lewat PowerShell:
+```powershell
+.\fulltunnel.exe
 ```
 Browser akan otomatis terbuka menampilkan dashboard di `http://127.0.0.1:28888`.
 
 #### Opsi Command Line:
-- `.\securetunnel.exe --headless` (Jalankan tanpa otomatis membuka browser)
-- `.\securetunnel.exe --connect` (Otomatis langsung mengaktifkan tunnel saat start)
-- `.\securetunnel.exe --port 30000` (Ganti port web dashboard)
+- `.\fulltunnel.exe --headless` (Jalankan tanpa otomatis membuka browser)
+- `.\fulltunnel.exe --connect` (Otomatis langsung mengaktifkan tunnel saat start)
+- `.\fulltunnel.exe --port 30000` (Ganti port web dashboard)
 
 ---
 
-### 3. Mode Headless CLI
+### 4. Menjalankan Binary Headless CLI
 Jalankan langsung melalui PowerShell / Command Prompt (Admin):
 ```powershell
-.\securetunnel-cli.exe -host 203.0.113.50 -port 1080 -type socks5 -user myuser -pass mysecretpassword
+.\fulltunnel-cli.exe -host 203.0.113.50 -port 1080 -type socks5 -user myuser -pass mysecretpassword
 ```
 
 #### Argumen CLI:
@@ -153,7 +158,7 @@ Jalankan langsung melalui PowerShell / Command Prompt (Admin):
 ## 📂 Struktur Konfigurasi (`config.json`)
 
 Konfigurasi disimpan secara otomatis di:
-`%USERPROFILE%\AppData\Roaming\SecureTunnel\config.json`
+`%USERPROFILE%\AppData\Roaming\FullTunnel\config.json`
 
 Contoh isi konfigurasi:
 ```json
@@ -173,7 +178,7 @@ Contoh isi konfigurasi:
       "bypass_lan": true
     }
   ],
-  "tun_name": "SecureTunnel",
+  "tun_name": "FullTunnel",
   "tun_ip": "172.19.0.1",
   "tun_mask": "255.255.255.252",
   "tun_gateway": "172.19.0.2",
@@ -196,22 +201,10 @@ Ikuti langkah-langkah berikut untuk mengunggah repositori ini ke GitHub:
 # 1. Buka folder full_tunnel di terminal
 cd "C:\Users\Kapiarso\Desktop\Project_Porto\full_tunnel"
 
-# 2. Inisialisasi Git repository (jika belum)
-git init
-
-# 3. Tambahkan semua file yang sudah terorganisir
-git add .
-
-# 4. Buat initial commit
-git commit -m "feat: Initial commit for SecureTunnel Enterprise full-tunnel connector"
-
-# 5. Atur default branch ke main
-git branch -M main
-
-# 6. Hubungkan dengan remote repository GitHub kamu
+# 2. Hubungkan dengan remote repository GitHub kamu
 git remote add origin https://github.com/<USERNAME-KAMU>/<NAMA-REPO-KAMU>.git
 
-# 7. Push ke GitHub
+# 3. Push ke GitHub
 git push -u origin main
 ```
 

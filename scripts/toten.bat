@@ -1,17 +1,18 @@
 @echo off
 :: ============================================================================
 :: EMERGENCY STOP & FULL CLEANUP SCRIPT (toten.bat)
-:: Stops SecureTunnel daemon, web panel, resets Windows routing table & DNS.
-:: NOTE: Explicitly preserves CCProxy.exe as requested.
+:: Stops FullTunnel daemon, web panel, resets Windows routing table & DNS.
 :: ============================================================================
 
-title SecureTunnel Emergency Stop
+title FullTunnel Emergency Stop
 
 echo ============================================================================
-echo [EMERGENCY STOP] Stopping SecureTunnel Engine, Web Panel ^& Routing Table...
+echo [EMERGENCY STOP] Stopping FullTunnel Engine, Web Panel ^& Routing Table...
 echo ============================================================================
 
-:: 1. Force kill SecureTunnel background daemon and CLI
+:: 1. Force kill FullTunnel background daemon and CLI
+taskkill /F /IM fulltunnel.exe >nul 2>&1
+taskkill /F /IM fulltunnel-cli.exe >nul 2>&1
 taskkill /F /IM securetunnel.exe >nul 2>&1
 taskkill /F /IM securetunnel-cli.exe >nul 2>&1
 
@@ -25,7 +26,7 @@ route delete 8000::/1 >nul 2>&1
 ipconfig /flushdns >nul 2>&1
 
 echo.
-echo [SUCCESS] SecureTunnel Engine and Web Panel stopped.
+echo [SUCCESS] FullTunnel Engine and Web Panel stopped.
 echo [SUCCESS] Windows Routing Table and DNS restored to original state.
 echo ============================================================================
 pause

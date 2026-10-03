@@ -27,7 +27,7 @@ func main() {
 	flag.Parse()
 
 	log.Println("=========================================================")
-	log.Println("  SecureTunnel Enterprise - Windows Full-Tunnel Connector")
+	log.Println("  FullTunnel Enterprise - Windows Full-Tunnel Connector")
 	log.Println("  Driver: Wintun L3 Ring-Buffer | Stack: gVisor Netstack")
 	log.Println("  Protocols: SOCKS5 (RFC 1928/1929 Auth) & HTTP CONNECT")
 	log.Println("=========================================================")

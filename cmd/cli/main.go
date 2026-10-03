@@ -51,14 +51,14 @@ func main() {
 	}
 
 	if *host == "" {
-		fmt.Println("SecureTunnel Enterprise CLI - Windows Full-Tunnel Connector")
+		fmt.Println("FullTunnel Enterprise CLI - Windows Full-Tunnel Connector")
 		fmt.Println("\nUsage:")
-		fmt.Println("  1-Liner: securetunnel-cli.exe <IP:PORT> atau <IP:PORT:USER:PASS>")
-		fmt.Println("  Flags:   securetunnel-cli.exe -proxy <IP:PORT:USER:PASS> [-type socks5|http]")
-		fmt.Println("  Detail:  securetunnel-cli.exe -host <IP> -port <PORT> [-user <USER>] [-pass <PASS>]")
+		fmt.Println("  1-Liner: fulltunnel-cli.exe <IP:PORT> atau <IP:PORT:USER:PASS>")
+		fmt.Println("  Flags:   fulltunnel-cli.exe -proxy <IP:PORT:USER:PASS> [-type socks5|http]")
+		fmt.Println("  Detail:  fulltunnel-cli.exe -host <IP> -port <PORT> [-user <USER>] [-pass <PASS>]")
 		fmt.Println("\nContoh:")
-		fmt.Println("  securetunnel-cli.exe 127.0.0.1:1080")
-		fmt.Println("  securetunnel-cli.exe 198.51.100.1:1080:username:password")
+		fmt.Println("  fulltunnel-cli.exe 127.0.0.1:1080")
+		fmt.Println("  fulltunnel-cli.exe 198.51.100.1:1080:username:password")
 		os.Exit(1)
 	}
 
