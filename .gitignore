@@ -1,0 +1,39 @@
+# Binaries & Executables
+*.exe
+*.exe~
+*.dll~
+bin/
+dist/
+out/
+
+# Runtime Generated Driver (Embedded driver will extract this automatically)
+/wintun.dll
+
+# Logs & Debugging
+*.log
+*.tmp
+debug/
+*.out
+
+# Go test / coverage artifacts
+*.test
+*.prof
+coverage.txt
+
+# OS Generated Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local development credentials / profiles
+*.env
+config.local.json
