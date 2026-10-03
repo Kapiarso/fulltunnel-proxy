@@ -29,7 +29,7 @@ func main() {
 	pass := flag.String("pass", "", "Password for authentication")
 	flag.Parse()
 
-	// Check positional arg (e.g. `securetunnel-cli.exe 127.0.0.1:1080`)
+	// Check positional arg (e.g. `fulltunnel-cli.exe 127.0.0.1:1080`)
 	args := flag.Args()
 	if len(args) > 0 && *proxyStr == "" && *host == "" {
 		*proxyStr = args[0]

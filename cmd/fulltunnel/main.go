@@ -26,12 +26,6 @@ func main() {
 	port := flag.Int("port", 28888, "Web dashboard & REST API port")
 	flag.Parse()
 
-	log.Println("=========================================================")
-	log.Println("  FullTunnel Enterprise - Windows Full-Tunnel Connector")
-	log.Println("  Driver: Wintun L3 Ring-Buffer | Stack: gVisor Netstack")
-	log.Println("  Protocols: SOCKS5 (RFC 1928/1929 Auth) & HTTP CONNECT")
-	log.Println("=========================================================")
-
 	// 1. Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
