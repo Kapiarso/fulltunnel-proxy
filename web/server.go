@@ -423,9 +423,6 @@ func (s *Server) handleServerStart(w http.ResponseWriter, r *http.Request) {
 	if body.Port <= 0 {
 		body.Port = 10800
 	}
-	if body.OutboundIP == "" {
-		body.OutboundIP = "192.168.18.32"
-	}
 
 	err := s.engine.StartLocalProxyServer(body.Port, body.OutboundIP, body.Username, body.Password)
 	if err != nil {

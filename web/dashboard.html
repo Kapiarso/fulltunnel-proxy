@@ -562,7 +562,7 @@
           await fetch('/api/server/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ port: 10800, outbound_ip: "192.168.18.32" })
+            body: JSON.stringify({ port: 10800 })
           });
           elem.innerText = "Running (Port 10800)";
           elem.style.color = "var(--success)";
