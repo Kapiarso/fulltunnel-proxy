@@ -58,8 +58,10 @@ func (s *Server) Start() error {
 
 	// WebSocket Live Stream
 	mux.Handle("/api/ws", websocket.Handler(s.handleWS))
+	mux.Handle("/ws", websocket.Handler(s.handleWS))
 
-	// Embedded Static UI
+	// Embedded Static UI Assets & Templates
+	mux.Handle("/static/", http.FileServer(http.FS(StaticFS)))
 	mux.HandleFunc("/", s.handleIndex)
 
 	s.server = &http.Server{
@@ -357,8 +359,12 @@ func (s *Server) broadcastLoop() {
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" && r.URL.Path != "/index.html" {
+		http.NotFound(w, r)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write([]byte(DashboardHTML))
+	_, _ = w.Write([]byte(IndexHTML))
 }
 
 func (s *Server) handleSpeedtest(w http.ResponseWriter, r *http.Request) {

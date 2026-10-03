@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Tunnel Proxy Connector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-name" style="font-size: 1.2rem; font-weight: 700; color: #ffffff;">Full Tunnel Proxy Connector</div>
+    </div>
+    <div class="header-right">
+      <div class="admin-status">
+        <div class="admin-dot"></div>
+        <span>Administrator</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Error Alert -->
+    <div class="alert-banner" id="alertBanner">
+      <span id="alertText">Connection error occurred</span>
+      <button class="alert-close" onclick="dismissAlert()">&times;</button>
+    </div>
+
+    <!-- Quick Connector Box -->
+    <div class="hero-card">
+      <div class="hero-header">
+        <div class="hero-title">Proxy Connection Target</div>
+        <div class="status-pill">
+          <div class="status-indicator" id="statusIndicator"></div>
+          <span id="statusText">Disconnected</span>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <input type="text" id="proxyInput" placeholder="127.0.0.1:1080 or IP:PORT:USER:PASS" value="127.0.0.1:1080" />
+        </div>
+        <select class="proto-select" id="protoSelect">
+          <option value="socks5" selected>SOCKS5</option>
+          <option value="http">HTTP</option>
+        </select>
+        <button class="btn-action" id="btnMain" onclick="handleConnect()">
+          <span id="btnMainText">Connect Full Tunnel</span>
+        </button>
+      </div>
+
+      <div class="profile-info">
+        <span>Active Adapter: <b style="color: #ffffff;">FullTunnel (Wintun)</b></span>
+        <span id="activeProfileText">Target: 127.0.0.1:1080</span>
+      </div>
+    </div>
+
+    <!-- Live Performance Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">
+          <span>Download Speed</span>
+          <span id="totalDownText">Total: 0 MB</span>
+        </div>
+        <div class="metric-value" id="downSpeed" style="color: var(--primary);">0.00 <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">Mbps</span></div>
+        <div class="metric-sub" id="peakDownBadge">Peak: 0.00 Mbps</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span>Upload Speed</span>
+          <span id="totalUpText">Total: 0 MB</span>
+        </div>
+        <div class="metric-value" id="upSpeed" style="color: var(--success);">0.00 <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">Mbps</span></div>
+        <div class="metric-sub" id="peakUpBadge">Peak: 0.00 Mbps</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Latency / Ping</div>
+        <div class="metric-value" id="latencyVal">-- <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">ms</span></div>
+        <div class="metric-sub">SOCKS5 Outbound RTT</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Active Sockets</div>
+        <div class="metric-value" id="activeSockets">0</div>
+        <div class="metric-sub">Live Encapsulated Flows</div>
+      </div>
+    </div>
+
+    <!-- 2 Column Section -->
+    <div class="grid-two">
+      <!-- Speed Test Card -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span>Speed Benchmark</span>
+          <span style="font-size: 0.75rem; color: var(--success); font-weight: 600;" id="matchStatus">READY</span>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Compare connection throughput between direct connection and proxy tunnel.</p>
+
+        <div class="verify-box">
+          <div class="verify-item">
+            <span class="verify-name">Direct Connection</span>
+            <span class="verify-val" id="resDirect">--</span>
+          </div>
+          <div class="verify-item">
+            <span class="verify-name">Proxy Connection</span>
+            <span class="verify-val" id="resProxy">--</span>
+          </div>
+          <div class="verify-item">
+            <span class="verify-name">Efficiency Ratio</span>
+            <span class="verify-val" id="resMatch" style="color: var(--success);">--</span>
+          </div>
+        </div>
+
+        <button class="btn-sub" id="btnVerify" onclick="runSpeedVerification()">Run Speed Test</button>
+      </div>
+
+      <!-- Public IP & Local Relay Card -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <span>Network & IP Info</span>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Check current public IP address and manage local relay listener.</p>
+
+        <div class="verify-box">
+          <div class="verify-item">
+            <span class="verify-name">Current Public IP</span>
+            <span class="verify-val" id="detectedIP">Querying...</span>
+          </div>
+          <div class="verify-item">
+            <span class="verify-name">Local Relay (Port 10800)</span>
+            <span class="verify-val" id="localProxyStatus" style="color: var(--warning);">Stopped</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-sub" style="flex: 1;" onclick="checkPublicIP()">Check IP</button>
+          <button class="btn-sub" style="flex: 1;" id="btnLocalProxy" onclick="toggleLocalProxy()">Toggle Local Relay</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Traffic Table -->
+    <div class="panel-card">
+      <div class="panel-title">
+        <span>Active Traffic Sockets</span>
+        <span style="font-size: 0.75rem; color: var(--text-dim);" id="connCountText">0 Active Connections</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Protocol</th>
+              <th>Destination Target</th>
+              <th>Source Socket</th>
+              <th>Upload</th>
+              <th>Download</th>
+            </tr>
+          </thead>
+          <tbody id="trafficBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 20px;">No active traffic passing through full tunnel</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Terminal Logs Panel -->
+    <div class="panel-card">
+      <div class="panel-title">
+        <span>Live System Terminal Logs</span>
+        <button class="btn-sub" style="padding: 4px 10px; font-size: 0.75rem;" onclick="clearTerminal()">Clear</button>
+      </div>
+      <div class="terminal" id="terminalBox">
+        <div class="log-row"><span class="log-time">[00:00:00]</span> <span class="log-tag log-INFO">[INFO]</span> <span class="log-text">FullTunnel Engine Initialized. Ready for connection.</span></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

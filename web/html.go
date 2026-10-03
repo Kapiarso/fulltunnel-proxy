@@ -1,6 +1,12 @@
 package web
 
-import _ "embed"
+import (
+	"embed"
+	_ "embed"
+)
 
-//go:embed dashboard.html
-var DashboardHTML string
+//go:embed templates/index.html
+var IndexHTML string
+
+//go:embed static/*
+var StaticFS embed.FS
